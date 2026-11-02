@@ -1,0 +1,36 @@
+import { test, expect } from '@playwright/test';
+test('workspace selections, pricing, download and persistence work', async ({ page }) => {
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await expect(page.locator('canvas')).toBeVisible({timeout:20000});
+ await expect(page.getByRole('heading',{name:/Good work starts/})).toBeVisible();
+ await page.getByRole('button',{name:/The Rise Desk/}).click();
+ await page.getByRole('tab',{name:'Chairs'}).click();
+ await page.getByRole('button',{name:/The Soft Spot/}).click();
+ await page.getByRole('tab',{name:'Extras'}).click();
+ await page.getByRole('button',{name:/Golden Hour Lamp/}).click();
+ await page.getByRole('button',{name:/Grounding Rug/}).click();
+ await page.getByRole('button',{name:'sage theme'}).click();
+ await page.getByLabel('How long is your Bali chapter?').selectOption('3');
+ await page.getByRole('button',{name:'Rent this setup'}).click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await expect(page.getByRole('dialog').getByText('Rp 3.442.500')).toBeVisible();
+ await page.getByRole('button',{name:'Remove Your Desk Buddy'}).click();
+ await expect(page.getByRole('dialog').getByText('Rp 3.307.500')).toBeVisible();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Download my setup'}).click();expect((await download).suggestedFilename()).toBe('my-monis-workspace.txt');
+ await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();
+ await page.reload();await expect(page.getByRole('button',{name:'sage theme'})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByLabel('How long is your Bali chapter?')).toHaveValue('3');
+ await page.screenshot({path:'/tmp/monis-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'Start fresh'}).click();
+ await expect(page.getByLabel('How long is your Bali chapter?')).toHaveValue('1');
+ expect(errors).toEqual([]);
+});
+test('mobile layout fits and checkout stays usable', async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/');
+ await expect(page.locator('canvas')).toBeVisible({timeout:20000});
+ await expect(page.getByRole('button',{name:'Rent this setup'})).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+ await page.screenshot({path:'/tmp/monis-mobile.png',fullPage:true});
+ await page.getByRole('button',{name:'Rent this setup'}).click();await expect(page.getByRole('button',{name:'Download my setup'})).toBeVisible();
+});
