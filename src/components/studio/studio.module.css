@@ -1,0 +1,53 @@
+.builder {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  /* Tall enough to enjoy, short enough to keep the Rent button on screen. */
+  height: clamp(500px, calc(100svh - 356px), 780px);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 25px;
+  transform: translateX(-50%) !important;
+  z-index: 50;
+  padding: 14px 22px;
+  background: #344138;
+  color: #fff;
+  border-radius: 9px;
+  box-shadow: 0 8px 35px #0002;
+  font-size: var(--text-sm);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 1000px) {
+  .workspace {
+    grid-template-columns: 300px 1fr;
+  }
+}
+@media (max-width: 760px) {
+  /* No overflow here: a clipping ancestor would stop the preview from sticking. */
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  .workspace > :last-child {
+    order: -1;
+  }
+  .toast {
+    width: max-content;
+    max-width: 90vw;
+    font-size: var(--text-xs);
+    bottom: 90px;
+  }
+}

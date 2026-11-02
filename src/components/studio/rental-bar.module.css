@@ -1,0 +1,150 @@
+.rentalBar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 12px;
+  padding: 14px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.duration {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 20px;
+}
+.duration h3 {
+  grid-column: 1;
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.duration :global(.step) {
+  grid-column: 1;
+}
+.plans {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.plans button {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 9px;
+  padding: 7px 4px;
+  display: grid;
+  gap: 1px;
+  text-align: center;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.plans button:hover {
+  border-color: var(--accent);
+}
+.plans button[aria-checked='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--tint);
+}
+.plans b {
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+.plans small {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+
+.checkoutBar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+.total {
+  min-width: 150px;
+}
+.total strong {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: -0.8px;
+}
+.total small {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.totalLabel {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.rentButton {
+  min-width: 180px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .rentalBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .checkoutBar {
+    justify-content: space-between;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+@media (max-width: 760px) {
+  /* On phones the total becomes its own bar, pinned so "Rent" is always in reach. */
+  .rentalBar {
+    display: contents;
+  }
+  .duration {
+    display: block;
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+  .duration h3 {
+    margin: 4px 0 12px;
+  }
+  .plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .checkoutBar {
+    position: sticky;
+    bottom: 8px;
+    z-index: 12;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 8px 28px #2e362d26;
+  }
+  .total {
+    min-width: 0;
+  }
+  .total strong {
+    font-size: 21px;
+  }
+  .rentButton {
+    min-width: 0;
+    padding: 13px 14px;
+    font-size: var(--text-sm);
+    gap: 6px;
+  }
+}

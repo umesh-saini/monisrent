@@ -1,0 +1,90 @@
+.catalog {
+  padding: 16px 18px 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+}
+.catalogHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.itemCount {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  background: var(--surface-sunken);
+  border-radius: 20px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.tabs {
+  display: flex;
+  padding: 4px;
+  background: #f2f2ec;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  gap: 2px;
+}
+.tabs button {
+  position: relative;
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  flex: 1;
+  padding: 10px 5px;
+  font-size: var(--text-sm);
+  z-index: 0;
+  color: var(--ink-muted);
+}
+.tabs button[aria-selected='true'] {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+.activeTab {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 1px 5px #00000012;
+  z-index: -1;
+}
+.productList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 3px;
+  margin: 0 -3px;
+}
+.cards {
+  display: grid;
+  gap: 12px;
+}
+.rows {
+  display: grid;
+  gap: 8px;
+}
+.catalogFooter {
+  margin: 0;
+  padding: 11px 0 13px;
+  color: var(--ink-muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .catalog {
+    padding: 16px 14px 0;
+  }
+  .productList {
+    overflow: visible;
+  }
+  .cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}

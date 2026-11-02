@@ -16,12 +16,6 @@ build
 .env
 .env.*
 !.env.example
-backend/.env
-backend/.env.*
-!backend/.env.example
-client/.env
-client/.env.*
-!client/.env.example
 
 # Logs
 *.log
@@ -42,3 +36,6 @@ Thumbs.db
 # Testing & Coverage
 coverage/
 .nyc_output/
+
+# Local editor tooling
+.kombai/

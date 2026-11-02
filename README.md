@@ -1,74 +1,106 @@
-# monis.rent — Workspace Studio
+# monis.rent Workspace Studio
 
-A responsive, interactive workspace rental concept for digital nomads in Bali. Build a setup in a live 3D room, change its mood, and download an itemized rental estimate.
+Design your Bali workspace in a live 3D room, then rent it.
 
-## Run locally
+A freelance developer lands in Bali and needs an office by next week. Instead of scrolling a
+product list, they pick a desk, drop in three monitors, make the desk stand up, check how the
+room feels at night, and go rent it.
 
-Requires Node.js 20.9+ (Node 22 or 24 recommended) and npm.
+**Live demo:** _add your deployed URL here_
+
+> This is a concept built for [monis.rent](https://monis.rent), not an official monis.rent site.
+> It doesn't place orders or take payment.
+
+## What it does
+
+**Building a setup**
+
+- Choose from 3 desks and 2 chairs, and stack up 12 extras. Monitors go up to three, and the row rearranges itself.
+- Start from a preset ("The founder", "The Bali dream") or hit **Surprise me**.
+- Watch each item drop into the room on a spring as you add it, and shrink away as you remove it.
+
+**Playing with the room**
+
+- **Stand up** raises the desk and everything on it, because real adjustable desks do that.
+- Switch between daytime, golden hour and night. The lighting fades, the lamp starts to matter, and the Bali view outside the window changes.
+- Click any object in the room to jump to it in the catalog.
+- Orbit, zoom, and reset the camera. Pick a wall colour.
+
+**Renting it**
+
+- Review the setup with a picture of the room you actually built.
+- Choose a delivery area and date.
+- Finish with a direct link to each item on monis.rent, a shareable URL, and a poster image to save.
+
+On phones the 3D preview stays pinned while you browse, so every pick is visible as you make it, and the Rent button is always in reach.
+
+## Real data, labelled honestly
+
+Product names, weekly prices and links come from monis.rent as listed on 2 Nov 2026. The pricing follows its published rules: a month is billed as four weeks, and stays of three months or more get 10% off.
+
+monis.rent lists only one chair, and the brief asks for at least two. So the Rattan Chair, plus the plant, rug and surfboard, are our own **concept** items with illustrative prices. They're marked "Concept" everywhere they appear and have no rent link.
+
+Prices are a snapshot, and availability isn't checked live. Delivery areas are examples, since monis.rent doesn't publish a list.
+
+## Run it locally
+
+Requires Node.js 20.9 or newer. No API keys or environment variables are needed.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. No API keys or environment variables are needed.
+Then open http://localhost:3000.
 
-```bash
-npm run typecheck
-npm test
-npm run build
-npm start
-```
+| Command                | What it does                                 |
+| ---------------------- | -------------------------------------------- |
+| `npm test`             | Logic tests: pricing, validation, share links |
+| `npm run test:browser` | Browser tests against the real app           |
+| `npm run typecheck`    | TypeScript                                   |
+| `npm run lint`         | ESLint                                       |
+| `npm run format`       | Prettier                                     |
+| `npm run build`        | Production build                             |
 
-Browser integration tests cover selections, duration pricing, accessory removal, downloads, persistence, and mobile overflow. Run `npx playwright test` with Google Chrome installed at `/usr/bin/google-chrome`, or set `CHROME_PATH` to its executable. The test configuration starts a development server automatically or reuses one on port 3000. Screenshots are saved to `/tmp/monis-desktop.png` and `/tmp/monis-mobile.png`.
+Browser tests need Google Chrome at `/usr/bin/google-chrome`, or set `CHROME_PATH`. They use software WebGL, so they don't need a GPU.
 
-## Features
+## How it's built
 
-- Two desks and two chairs, with distinct original models and illustrations.
-- Toggle monitor, lamp, plant, and rug accessories in the live Three.js room.
-- Orbit, zoom, reset the camera, and expand the preview; Escape closes the expanded view.
-- Coral, sage, and lavender themes update CSS variables and the room materials.
-- One, three, and six month estimates, including illustrative long-stay discounts.
-- Itemized review dialog with accessory removal and downloadable text estimate.
-- Validated localStorage persistence; start fresh restores defaults.
-- Responsive desktop/mobile layout, labeled controls, native modal focus handling, and reduced-motion support.
-- Framer Motion category transitions and shared tab indicator.
-
-## Stack and structure
-
-Next.js App Router, React, TypeScript, Framer Motion, Three.js, React Three Fiber, Drei, and Lucide icons. Styling uses CSS with theme variables. All furniture illustrations and 3D geometry are authored in the source; no model downloads are needed. Google Fonts supplies DM Sans and Manrope, with system fallbacks if unavailable.
+Next.js, React, TypeScript, Three.js through React Three Fiber, Framer Motion, and CSS Modules.
 
 ```text
-src/app/                  Page shell, metadata, and responsive styles
-src/components/studio.tsx Builder state, catalog, theme and checkout interactions
-src/components/workspace-scene.tsx  Procedural 3D room, lights, camera controls
-src/components/product-art.tsx      Original SVG product illustrations
-src/lib/catalog.ts        Product data, pricing, saved-state validation
-tests/catalog.test.ts     Pricing and persistence validation tests
+src/
+  lib/                 Pure logic, no React: easy to test
+    catalog.ts         Every product and its price
+    rental-plans.ts    Rental lengths and discounts
+    pricing.ts         Turns a setup into a quote
+    setup.ts           The Setup type, its changes, and validation
+    presets.ts         Starter rooms and "Surprise me"
+    share-link.ts      Setup <-> readable URL
+    setup-card.ts      Draws the poster image
+  hooks/               Saving the setup, loading shared links
+  components/
+    studio/            The page: catalog, preview panel, rental bar
+    dialogs/           Checkout steps and help
+    product-art/       Hand-written SVG product illustrations
+    scene/             The 3D room
+      models/          Each piece of furniture, as code
+      appear.tsx       The spring that drops items into the room
+      lighting.tsx     Time-of-day lighting and fades
+      window-view.ts   Paints the Bali view onto a canvas
+      camera-rig.tsx   Orbit, framing, smooth reset
+tests/                 Logic tests, and browser tests in tests/browser
 ```
 
-The server-rendered page loads the interactive builder as a client component. The WebGL scene is dynamically imported without SSR. A single typed setup state drives the catalog, room, and checkout. Prices are stored as integer Indonesian rupiah and formatted for the Indonesian locale. The pure pricing function makes discount calculations independently testable. Saved browser data is validated against allowed catalog items, durations, and themes before use.
+A few decisions worth explaining:
 
-The room uses procedural geometry instead of external assets to keep the experience self-contained and make equipment changes immediate. An error boundary keeps the catalog and checkout usable if WebGL fails. Furniture is positioned intentionally rather than freely draggable; users orbit the room to inspect their selections.
+- **One state object.** A single `Setup` drives the catalog, the room, the price and the checkout, so they can't disagree.
+- **Everything 3D is code.** There are no model files to download, so the room loads quickly and changes instantly. The window view is painted at runtime too.
+- **The canvas renders on demand.** It only draws while something is moving, so an idle tab doesn't drain a laptop battery.
+- **Animation doesn't depend on frame rate.** Easing is time-based and the spring runs in fixed sub-steps, so a slow GPU sees fewer frames rather than slow motion.
+- **Untrusted data gets validated.** Saved setups and share links both pass through `parseSetup`, so a tampered link can't produce a broken room.
+- **Prices are integer cents.** That avoids floating-point rounding in totals.
 
-## Scope and demo assumptions
+## What a production version would need
 
-This is a frontend prototype, not a live rental service. Product names, prices, dimensions, discount rules, and delivery statements are illustrative, not verified monis.rent offers. The estimate explicitly excludes unconfirmed delivery fees, taxes, and deposits. Downloading an estimate does not create a booking, charge a payment, or contact monis.rent. Preferences stay in this browser only.
-
-Before production, integrate the real catalog/inventory, authoritative server-side pricing, delivery availability, booking API, payment provider, and applicable terms. No credentials should be placed in client code.
-
-## Deployment and GitHub handoff
-
-Deployment and repository management are intentionally left to you. On Vercel, import your GitHub repository, select the Next.js framework, keep the root directory at the repository root, and use `npm run build`. Other Node-compatible Next.js hosts can run `npm ci`, `npm run build`, and `npm start`.
-
-After publishing, add the public URL to this README and the GitHub repository description. Add `desent-bot` through the repository's **Settings → Collaborators** and verify the invitation. Review the existing Git changes before committing: this checkout already contained deletions of an older frontend/backend project before this implementation.
-
-## Manual acceptance check
-
-1. Switch between both desks and both chairs and inspect their 3D geometry.
-2. Toggle every accessory and confirm the preview and price change together.
-3. Change themes, orbit/zoom, reset the camera, and expand/close the room.
-4. Select 3 or 6 months and verify the discount in the review dialog.
-5. Remove an accessory in the dialog and download the updated estimate.
-6. Reload to confirm persistence; start fresh to restore defaults.
-7. Check at a narrow mobile width and navigate controls with a keyboard.
+The real catalog and live availability from monis.rent's API, a cart it can pre-fill so "Rent" becomes one click, and its real delivery areas, fees and deposit rules.
