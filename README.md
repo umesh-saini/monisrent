@@ -6,10 +6,23 @@ A freelance developer lands in Bali and needs an office by next week. Instead of
 product list, they pick a desk, drop in three monitors, make the desk stand up, check how the
 room feels at night, and go rent it.
 
-**Live demo:** _add your deployed URL here_
+**Live demo:** https://monisrent-three.vercel.app/
 
 > This is a concept built for [monis.rent](https://monis.rent), not an official monis.rent site.
 > It doesn't place orders or take payment.
+
+## Write-up
+
+**Approach.** The brief's user doesn't want a catalog, they want to get excited about a room. So the 3D room is the main event and the product list only feeds it: items drop in with a bounce, the desk really rises, and the room changes from day to night. It started from a working prototype whose code was minified and hard to follow. The first step was splitting that into small, readable files, checked by comparing screenshots pixel by pixel, and the new features came after. Using real monis.rent products and pricing rules keeps the tool honest, and anything invented is labelled.
+
+**Tech choices.** Next.js and TypeScript for a fast static page and safe refactoring. React Three Fiber lets the room be ordinary React components driven by a single `Setup` object, so the room, price and checkout can't disagree. All furniture is built from code, so there are no model files to download. The canvas draws only while something is moving, which saves battery. CSS Modules keep the styles beside each component and the JSX easy to read.
+
+**With more time.**
+
+- Connect to monis.rent's real catalog and live availability, and pre-fill its cart so "Rent" takes one click instead of one link per item.
+- Use its real delivery areas, fees and deposit rules in the checkout.
+- Let people drag items to where they want them, rather than using fixed positions.
+- Reduce the roughly 340 draw calls per frame by merging geometry, and test on real low-end phones. So far, automated tests have only run on software rendering.
 
 ## What it does
 
@@ -53,14 +66,14 @@ npm run dev
 
 Then open http://localhost:3000.
 
-| Command                | What it does                                 |
-| ---------------------- | -------------------------------------------- |
+| Command                | What it does                                  |
+| ---------------------- | --------------------------------------------- |
 | `npm test`             | Logic tests: pricing, validation, share links |
-| `npm run test:browser` | Browser tests against the real app           |
-| `npm run typecheck`    | TypeScript                                   |
-| `npm run lint`         | ESLint                                       |
-| `npm run format`       | Prettier                                     |
-| `npm run build`        | Production build                             |
+| `npm run test:browser` | Browser tests against the real app            |
+| `npm run typecheck`    | TypeScript                                    |
+| `npm run lint`         | ESLint                                        |
+| `npm run format`       | Prettier                                      |
+| `npm run build`        | Production build                              |
 
 Browser tests need Google Chrome at `/usr/bin/google-chrome`, or set `CHROME_PATH`. They use software WebGL, so they don't need a GPU.
 
@@ -82,7 +95,7 @@ src/
   components/
     studio/            The page: catalog, preview panel, rental bar
     dialogs/           Checkout steps and help
-    product-art/       Hand-written SVG product illustrations
+    product-art/       SVG product illustrations, written as code
     scene/             The 3D room
       models/          Each piece of furniture, as code
       appear.tsx       The spring that drops items into the room
@@ -100,7 +113,3 @@ A few decisions worth explaining:
 - **Animation doesn't depend on frame rate.** Easing is time-based and the spring runs in fixed sub-steps, so a slow GPU sees fewer frames rather than slow motion.
 - **Untrusted data gets validated.** Saved setups and share links both pass through `parseSetup`, so a tampered link can't produce a broken room.
 - **Prices are integer cents.** That avoids floating-point rounding in totals.
-
-## What a production version would need
-
-The real catalog and live availability from monis.rent's API, a cart it can pre-fill so "Rent" becomes one click, and its real delivery areas, fees and deposit rules.
